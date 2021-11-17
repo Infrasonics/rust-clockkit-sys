@@ -120,7 +120,6 @@ fn main() -> io::Result<()> {
     println!("cargo:rustc-flags=-l dylib=stdc++");
     println!("cargo:rustc-flags=-l dylib=pthread");
     println!("cargo:rustc-flags=-l dylib=dl");
-    println!("cargo:rustc-flags=-l dylib=ccgnu2");
     Ok(())
 
 }
