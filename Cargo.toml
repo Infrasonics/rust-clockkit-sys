@@ -15,7 +15,7 @@ categories = ["external-ffi-bindings", "date-and-time"]
 
 [build-dependencies]
 bindgen = { version = "0.59.1", features = ["runtime"], optional = true }
-cc = "1.0"
+cc = "~1.0"
 
 [dependencies]
 

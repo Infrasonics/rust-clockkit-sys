@@ -1,5 +1,5 @@
-use std::path::{Path, PathBuf};
 use std::io;
+use std::path::{Path, PathBuf};
 
 #[cfg(feature = "make_bindings")]
 use std::env;
@@ -21,25 +21,29 @@ fn main() -> io::Result<()> {
         "PhaseLockedClock.cpp",
         "SystemClock.cpp",
         "Timestamp.cpp",
-        "VariableFrequencyClock.cpp"
-    ].iter().map(|f| {
-        bundle_dir.join(f)
-    }).collect::<Vec<PathBuf>>();
+        "VariableFrequencyClock.cpp",
+    ]
+    .iter()
+    .map(|f| bundle_dir.join(f))
+    .collect::<Vec<PathBuf>>();
 
     cc::Build::new()
         .files(ckfiles)
         .cpp(true)
         .flag("--std=c++17")
+        .warnings(false)
+        .extra_warnings(false)
         .compile("libclockkit.a");
 
     // Build the server for testing, unfortunately this clutters the src directory with object
     // files
     #[cfg(feature = "build_server")]
     {
-    Command::new("make")
-        .arg("ckserver")
-        .current_dir(&bundle_dir)
-        .status().unwrap();
+        Command::new("make")
+            .arg("ckserver")
+            .current_dir(&bundle_dir)
+            .status()
+            .unwrap();
     }
 
     let path_libclang = match std::env::var("LIBCLANG_PATH") {
@@ -58,20 +62,16 @@ fn main() -> io::Result<()> {
         }
     };
 
-
     /* Left here as documentation on how the bindings were generated */
     #[cfg(feature = "make_bindings")]
     {
-
         let bindings = bindgen::builder()
             // std
             .opaque_type("std::.*")
             .opaque_type(".*string")
             .blocklist_function(".*String_String3")
-
             // kissnet
             .blocklist_function(".*endpoint_.*")
-
             // clockkit
             .blocklist_type(".*dur")
             .blocklist_type(".*tp")
@@ -91,24 +91,29 @@ fn main() -> io::Result<()> {
             .generate_inline_functions(true)
             .disable_name_namespacing()
             .allowlist_recursively(true)
-            .clang_args(&["-x", "c++",
+            .clang_args(&[
+                "-x",
+                "c++",
                 "--std=c++17",
                 //XXX bindgen having trouble with C++ headers
-                "-I", &_path_cppinclude
-            ]
-            ).generate()
+                "-I",
+                &_path_cppinclude,
+            ])
+            .generate()
             .expect("Unable to generate bindings");
 
         // Write the bindings to the $OUT_DIR/bindings.rs file.
         let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
-        bindings.write_to_file(out_path.join("bindings.rs"))
+        bindings
+            .write_to_file(out_path.join("bindings.rs"))
             .expect("Unable to write bindings!");
 
         // Development code to update the bindings file(s) when bindgen config changes
         #[cfg(feature = "update_bindings")]
         {
-        bindings.write_to_file("src/bindgen/amd64_unknown_linux_default")
-            .expect("Unable to write bindings!");
+            bindings
+                .write_to_file("src/bindgen/amd64_unknown_linux_default")
+                .expect("Unable to write bindings!");
         }
     }
 
@@ -121,5 +126,4 @@ fn main() -> io::Result<()> {
     println!("cargo:rustc-flags=-l dylib=pthread");
     println!("cargo:rustc-flags=-l dylib=dl");
     Ok(())
-
 }
