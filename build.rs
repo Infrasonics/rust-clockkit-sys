@@ -31,6 +31,7 @@ fn main() -> io::Result<()> {
         .files(ckfiles)
         .cpp(true)
         .flag("--std=c++17")
+        .flag("-static")
         .warnings(false)
         .extra_warnings(false)
         .compile("libclockkit.a");
