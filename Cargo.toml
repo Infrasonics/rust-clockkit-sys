@@ -1,6 +1,6 @@
 [package]
 name = "clockkit-sys"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Fabian Dreer <infrasonics@gmx.de>"]
 edition = "2021"
 # links = "clockkit"
@@ -16,8 +16,6 @@ categories = ["external-ffi-bindings", "date-and-time"]
 [build-dependencies]
 bindgen = { version = "0.59.1", features = ["runtime"], optional = true }
 cc = "~1.0"
-
-[dependencies]
 
 [features]
 default = []
