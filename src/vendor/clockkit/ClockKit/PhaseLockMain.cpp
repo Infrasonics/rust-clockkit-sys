@@ -1,5 +1,4 @@
 #include <atomic>
-#include <iostream>
 #include <limits>
 #include <thread>
 
@@ -24,14 +23,14 @@ int main(int argc, char* argv[])
     auto [plc, cli] = config.buildClock();
 
     const auto fTerminate = argc == 3;
-    microseconds runtime(fTerminate ? int64_t(1000000 * atof(argv[2])) : 0);
+    microseconds runtime(fTerminate ? int64_t(1000000 * parseFloat(argv[2])) : 0);
     std::atomic_bool end_clocks(fTerminate && runtime.count() <= 0);
     std::thread th_clock(&PhaseLockedClock::run, plc, std::ref(end_clocks));
 
     while (!end_clocks) {
         const auto offset = UsecFromDur(plc->getOffset());
         std::cout << "offset: " << (offset == usecInvalid ? "invalid" : std::to_string(offset)) << "\n"
-                  << timestampToString(plc->getValue()) << std::endl;
+                  << StringFromTp(plc->getValue()) << std::endl;
         // endl flushes stdout, to show output even after Ctrl+C.
         std::this_thread::sleep_for(200ms);
         if (fTerminate) {

@@ -27,23 +27,27 @@ class ClockClient : public Clock {
     {
     }
 
+    // Another client with the same host:port would be dangerous, not useful.
+    ClockClient(const ClockClient&) = delete;
+    ClockClient& operator=(const ClockClient&) = delete;
+
     // Get the ClockServer's "current" time.
     // Slower and less accurate than getPhase().
     // Calls getPhase(SystemClock::instance()).
     // Returns "invalid" on error.
     tp getValue();
 
-    inline int getTimeout() const
+    int getTimeout() const
     {
         return UsecFromDur(timeout_);
     }
-    inline void setTimeout(int64_t usec)
+    void setTimeout(int64_t usec)
     {
         if (usec != usecInvalid)
             timeout_ = DurFromUsec(usec);
     }
 
-    inline dur rtt() const
+    dur rtt() const
     {
         return rtt_;
     }
@@ -52,7 +56,7 @@ class ClockClient : public Clock {
     // instead of internally by getValue(),
     // it finishes by sending the server an ACKNOWLEDGE packet,
     // for the server to track the total error bound.
-    inline void setAcknowledge(bool acknowledge)
+    void setAcknowledge(bool acknowledge)
     {
         acknowledge_ = acknowledge;
     }
@@ -60,7 +64,7 @@ class ClockClient : public Clock {
     // Phase between a local clock and a ClockServer's clock.
     // Reports the phase to the server, if acknowledge_.
     // The most accurate way to get timing from a ClockServer.
-    inline dur getPhase(Clock& clock)
+    dur getPhase(Clock& clock)
     {
         return getPhase(clock, acknowledge_);
     }
@@ -72,9 +76,6 @@ class ClockClient : public Clock {
     }
 
    private:
-    explicit ClockClient(ClockClient&);
-    ClockClient& operator=(ClockClient&);
-
     dur timeout_;  // The max error on phase calculations.
     dur rtt_;      // The previous call's round trip time.
     seqnum sequence_;

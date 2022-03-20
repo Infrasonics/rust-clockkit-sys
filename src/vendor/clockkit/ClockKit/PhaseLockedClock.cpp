@@ -1,7 +1,6 @@
 #include "PhaseLockedClock.h"
 
 #include <cstdlib>
-#include <iostream>
 #include <mutex>
 #include <random>
 #include <thread>
@@ -20,6 +19,7 @@ using namespace std::chrono;
 // One mutex for *all* PLCs may be too careful in practice,
 // but it lets multiple PLCs use the same reference clock.
 std::mutex mutexPLC;
+using Guard = const std::lock_guard<std::mutex>;
 
 PhaseLockedClock::PhaseLockedClock(Clock &primary, Clock &reference)
     : primaryClock_(primary)
@@ -43,7 +43,7 @@ tp PhaseLockedClock::getValue()
 {
     if (!inSync_)
         return tpInvalid;
-    const std::lock_guard<std::mutex> lock(mutexPLC);
+    Guard guard(mutexPLC);
     return variableFrequencyClock_.getValue();
 }
 
@@ -55,7 +55,7 @@ dur PhaseLockedClock::getOffset()
 void PhaseLockedClock::run(std::atomic_bool &end_clocks)
 {
     // Smear how often we update(), to not overload the server with simultaneous requests.
-    std::uniform_real_distribution<double> vary(0.95, 1.05);  // +-5%
+    std::uniform_real_distribution<double> vary(1 / 1.05, 1.05);  // +-5%
     std::default_random_engine randNumGen;
     randNumGen.seed(std::random_device{}());
     while (!end_clocks) {
@@ -164,13 +164,13 @@ bool PhaseLockedClock::updateClock()
 
     {
         // Measure referenceClock_'s elapsed time.
-        // We've checked that none of these are invalid.
+        // None of these are invalid.
         const auto referenceValuePrev = variableValuePrev_ + phasePrev_;
         const auto referenceValue = variableValue_ + phase_;
         const auto referenceElapsed = UsecFromDur(referenceValue - referenceValuePrev);
 
         // Estimate the primary clock's frequency.
-        // We've checked that none of these are invalid.
+        // None of these are invalid.
         // Average away noise with an IIR filter.
         const auto ticks = UsecFromDur(primaryValue_ - primaryValuePrev_);
         const auto primaryFrequency = ticks * 1000000.0 / referenceElapsed;
@@ -188,7 +188,7 @@ bool PhaseLockedClock::updateClock()
 #ifdef DEBUG
     cout << "frequency := " << variableClockFrequency << endl;
 #endif
-    const std::lock_guard<std::mutex> lock(mutexPLC);
+    Guard guard(mutexPLC);
     variableFrequencyClock_.setFrequency(variableClockFrequency);
     return true;
 }
@@ -199,7 +199,7 @@ void PhaseLockedClock::setClock()
     cout << "resyncing" << endl;
 #endif
     inSync_ = true;
-    const std::lock_guard<std::mutex> lock(mutexPLC);
+    Guard guard(mutexPLC);
     variableFrequencyClock_.setValue(referenceClock_.getValue());
 }
 

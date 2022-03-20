@@ -1,9 +1,10 @@
 MAKEFLAGS += --jobs=99
-CPP = c++
+# CPP = c++
+CPP = armv6j-hardfloat-linux-musleabi-c++
 
 # -fPIC is only to make $(SWIGEXES).
 # -fpic would be smaller and faster, but that is only for gcc.
-CFLAGS = -O3 -fPIC -Wall -Werror -Weffc++ -std=c++17
+CFLAGS = -O3 -fPIC -Wall -Werror -Weffc++ -std=c++17 -static
 LIBS = -lpthread -ldl
 
 # Optional file containing debugging options for CFLAGS and LDFLAGS.

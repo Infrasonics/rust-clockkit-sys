@@ -18,6 +18,9 @@ class PhaseLockedClock : public Clock {
 
     ~PhaseLockedClock() = default;
 
+    PhaseLockedClock(PhaseLockedClock&) = delete;
+    PhaseLockedClock& operator=(PhaseLockedClock&) = delete;
+
     // Kill the referenceClock_, which is likely a ClockClient, and its ClockServer.
     void die()
     {
@@ -29,7 +32,7 @@ class PhaseLockedClock : public Clock {
     // Return whether we're in sync with referenceClock_.
     // Sync becomes lost if the vfc's previous update was too long ago,
     // or if the vfc's offset relative to referenceClock_ becomes too large.
-    inline bool isSynchronized() const
+    bool isSynchronized() const
     {
         return inSync_;
     }
@@ -37,12 +40,12 @@ class PhaseLockedClock : public Clock {
     // Phase offset of vfc relative to referenceClock_, i.e., phase_.
     dur getOffset();
 
-    inline void setPhasePanic(dur phasePanic)
+    void setPhasePanic(dur phasePanic)
     {
         phasePanic_ = phasePanic;
     }
 
-    inline void setUpdatePanic(dur usec)
+    void setUpdatePanic(dur usec)
     {
         if (updatePanic_ != durInvalid)
             updatePanic_ = usec;
@@ -63,9 +66,6 @@ class PhaseLockedClock : public Clock {
     void setClock();
 
    private:
-    explicit PhaseLockedClock(PhaseLockedClock&);
-    PhaseLockedClock& operator=(PhaseLockedClock&);
-
     Clock& primaryClock_;
     Clock& referenceClock_;
     VariableFrequencyClock variableFrequencyClock_;

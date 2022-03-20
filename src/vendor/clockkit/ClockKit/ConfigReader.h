@@ -12,8 +12,8 @@ class ConfigReader {
     static const auto defaultPhasePanic = 5000u;
     static const auto defaultUpdatePanic = 5000000u;
 
-    explicit inline ConfigReader()
-        : server{"localhost"}
+    explicit ConfigReader()
+        : server{"127.0.0.1"}
         , port{defaultPort}
         , timeout{defaultTimeout}
         , phasePanic{defaultPhasePanic}

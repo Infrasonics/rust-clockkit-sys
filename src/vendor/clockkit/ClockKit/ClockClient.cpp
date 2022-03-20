@@ -15,6 +15,7 @@ ClockClient::ClockClient(kissnet::endpoint addr_port)
     , acknowledge_(false)
     , socket_(addr_port)
 {
+    kissnet_init();
 }
 
 bool ClockClient::sendPacket(const ClockPacket& packet)
@@ -78,9 +79,9 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
         if (packet.getType() == ClockPacket::KILL) {
             exit(0);  // todo: kill just the ClockClient, not the entire process?  That's too harsh.
         }
-        if (packet.sequenceNumber_ != sequence_) {
+        if (packet.getSeqnum() != sequence_) {
 #ifdef DEBUG
-            cerr << "ignored out-of-order packet " << packet.sequenceNumber_ << "; expected " << sequence_ << "\n";
+            cerr << "ignored out-of-order packet " << packet.getSeqnum() << "; expected " << sequence_ << "\n";
 #endif
             continue;
         }

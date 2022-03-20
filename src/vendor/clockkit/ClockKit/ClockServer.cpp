@@ -1,7 +1,6 @@
 #include "ClockServer.h"
 
 #include <cmath>
-#include <iostream>
 
 #include "ClockPacket.h"
 
@@ -17,16 +16,17 @@ ClockServer::ClockServer(kissnet::endpoint addr_port, Clock& clock)
     , log_(false)
     , tRecalculated_(clock_.getValue())
 {
+    kissnet_init();
 }
 
 void ClockServer::run()
 {
-    if (log_)
-        cout << "time                     host    \toffset\tround-trip-time" << endl;
-    constexpr auto length = ClockPacket::PACKET_LENGTH;
-    ClockPacket::packetbuf buffer;
     kissnet::udp_socket socket(addr_port_);
     socket.bind();
+    constexpr auto length = ClockPacket::PACKET_LENGTH;
+    ClockPacket::packetbuf buffer;
+    if (log_)
+        cout << "time                     host    \toffset\tround-trip-time" << endl;
 
     for (;;) {
         kissnet::addr_collection peer;
@@ -64,8 +64,6 @@ void ClockServer::run()
                     break;
                 }
             case ClockPacket::ACKNOWLEDGE:
-                // CC++ printed localhost as "localhost", unlike kissnet's "127.0.0.1."
-                // But no test cases used that.
                 updateEntry(peer2.address, packet.getClockOffset(), packet.rtt(), now);
                 break;
             case ClockPacket::KILL:
@@ -76,11 +74,13 @@ void ClockServer::run()
     }
 }
 
+// Don't shrink this to (addr, packet, now), because
+// that would more tightly couple ClockServer.h to ClockPacket.h.
 void ClockServer::updateEntry(const string& addr, dur offset, dur rtt, tp now)
 {
     if (!log_)
         return;
-    const auto nowStr = timestampToString(now);
+    const auto nowStr = StringFromTp(now);
     cout << nowStr << ' ' << addr << '\t' << UsecFromDur(offset) << '\t' << UsecFromDur(rtt) << endl;
     ackData_[addr] = Entry(now, offset, rtt);
 

@@ -67,6 +67,8 @@ PhaseLockedClock* ConfigReader::buildPLC() {
     return plc;
 }
 
+
+
 void ConfigReader::print()
 {
     std::cout << "config:\n  server: " << server << "\n  port: " << port << "\n  timeout: " << timeout

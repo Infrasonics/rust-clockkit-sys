@@ -15,7 +15,7 @@
 For further details see the [clockkit repository](https://github.com/camilleg/clockkit).
 
 ## Version bundled
-8ddc8f80c79dba9cebe7f67bc299164e78ae7b0f
+a7856021da846988d022879c95ec745caa5ae9e8
 
 # License
 MIT
