@@ -13,5 +13,13 @@ pub type tp = i64;
 ))]
 include!("bindgen/amd64_unknown_linux_default");
 
+#[cfg(all(
+    target_os = "linux",
+    target_arch = "arm",
+    target_env = "gnu",
+    not(feature = "make_bindings")
+))]
+include!("bindgen/arm_unknown_linux_gnueabihf");
+
 #[cfg(feature = "make_bindings")]
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
