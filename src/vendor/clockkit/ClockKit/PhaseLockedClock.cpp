@@ -96,6 +96,18 @@ void PhaseLockedClock::update()
     }
 }
 
+void PhaseLockedClock::setPhasePanic(dur phasePanic)
+{
+    phasePanic_ = phasePanic;
+}
+
+void PhaseLockedClock::setUpdatePanic(dur usec)
+{
+    if (updatePanic_ != durInvalid)
+        updatePanic_ = usec;
+}
+
+
 bool PhaseLockedClock::updatePhase()
 {
     if (!inSync_)

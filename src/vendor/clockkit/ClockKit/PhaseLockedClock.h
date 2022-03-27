@@ -40,16 +40,9 @@ class PhaseLockedClock : public Clock {
     // Phase offset of vfc relative to referenceClock_, i.e., phase_.
     dur getOffset();
 
-    void setPhasePanic(dur phasePanic)
-    {
-        phasePanic_ = phasePanic;
-    }
+    void setPhasePanic(dur phasePanic);
 
-    void setUpdatePanic(dur usec)
-    {
-        if (updatePanic_ != durInvalid)
-            updatePanic_ = usec;
-    }
+    void setUpdatePanic(dur usec);
 
     // Call update() periodically, until the caller sets the arg to true.
     void run(std::atomic_bool&);
