@@ -1,3 +1,7 @@
+# Archived
+This project has been archived since newer versions of [rust-clockkit](https://github.com/Infrasonics/rust-clockkit) will
+not rely on C-bindings but rather bridge to C++.
+
 # Caveats
 - includes bingen-generated bindings for amd64 in a file to save the
   dependency, other architectures need to use `--features make_bindings`.
